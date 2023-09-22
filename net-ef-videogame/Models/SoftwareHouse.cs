@@ -12,18 +12,18 @@ namespace net_ef_videogame.Models
     [Index(nameof(TaxId), IsUnique = true)]
     public class SoftwareHouse
     {
-        public long SoftwareHouseId { get; private set; }
+        public long SoftwareHouseId { get; set; }
         [Column(TypeName = "VARCHAR(100)")]
-        public string Name { get; private set; }
+        public string Name { get; set; }
         [Column(TypeName = "VARCHAR(50)")]
-        public string TaxId { get; private set; }
+        public string TaxId { get; set; }
         [Column(TypeName = "VARCHAR(50)")]
-        public string City { get; private set; }
+        public string City { get; set; }
         [Column(TypeName = "VARCHAR(50)")]
-        public string Country { get; private set; }
+        public string Country { get; set; }
 
 
-        public List<Videogame> Videogames { get; private set; }
+        public List<Videogame> Videogames { get; set; }
 
         public override string ToString()
         {
