@@ -70,9 +70,24 @@ namespace net_ef_videogame
             Console.Write("Enter the videogame release date (dd/mm/yyyy): ");
             DateTime videogameReleaseDate = GetValidDateFromUser();
 
-            Console.Write("Enter the software house id: ");
-            int videogameSHId = GetValidPositiveIntegerFromUser();
+            List<SoftwareHouse> shList = GetSoftwareHousesList();
+            var shMenu = new ConsoleTable(" --- Choose Software House --- ");
+            foreach (SoftwareHouse house in shList)
+            {
+                shMenu.AddRow($"{house.SoftwareHouseId} - {house.Name}");
+            }
 
+            Console.WriteLine("\n");
+            shMenu.Write();
+            Console.WriteLine("\n");
+
+            Console.Write("Enter the software house id: ");
+            int videogameSHId = GetValidPositiveIntegerFromUser(); ;
+            while (videogameSHId > shList.Count())
+            {
+                Console.Write("Id out of range. Insert a valid value: ");
+                videogameSHId = GetValidPositiveIntegerFromUser();
+            } 
             
             Videogame newVideogame = new Videogame()
             {
@@ -229,13 +244,35 @@ namespace net_ef_videogame
             }
         }
 
+        // UTILITIES
+
+        public static List<SoftwareHouse> GetSoftwareHousesList()
+        {
+            List<SoftwareHouse> softwareHousesList = new List<SoftwareHouse>();
+
+            using (VideogameContext db = new VideogameContext())
+            {
+                try
+                {
+                    softwareHousesList = db.SoftwareHouses.ToList<SoftwareHouse>();
+
+                }
+                catch (Exception ex)
+                {
+                    //Console.WriteLine(ex.Message);
+                }
+            }
+
+            return softwareHousesList;
+        }
+
         // USER INPUT FUNCTIONS
         public static string GetValidStringFromUser()
         {
             string? userInput = Console.ReadLine();
             while (string.IsNullOrEmpty(userInput) || userInput.Trim() == "")
             {
-                Console.Write("Inserisci un valore valido: ");
+                Console.Write("Insert a valid value: ");
                 userInput = Console.ReadLine();
             }
             return userInput;
@@ -245,7 +282,7 @@ namespace net_ef_videogame
             DateTime userInput;
             while (!DateTime.TryParseExact(Console.ReadLine(), "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out userInput))
             {
-                Console.Write("Inserisci un formato di data valido: ");
+                Console.Write("Insert a valid date format: ");
             }
             return userInput;
         }
@@ -254,17 +291,16 @@ namespace net_ef_videogame
             int userInput;
             while (!int.TryParse(Console.ReadLine(), out userInput) || userInput <= 0)
             {
-                Console.Write("Inserisci un numero positivo valido: ");
+                Console.Write("Insert a positive number: ");
             }
             return userInput;
         }
         public static string GetOptionalParameterFromUser(string parameterName)
         {
             string outputString = "";
-            bool looping = true;
-            while (looping)
+            string userChoice = "";
+            while (userChoice != "n")
             {
-                string userChoice = "";
                 Console.Write($"Do you want to set the {parameterName}? (y/n) ");
                 userChoice = GetValidStringFromUser().ToLower();
 
@@ -272,12 +308,10 @@ namespace net_ef_videogame
                 {
                     Console.Write($"Enter the {parameterName}: ");
                     outputString = GetValidStringFromUser();
-                    looping = false;
                 }
-                else if (userChoice == "n" || userChoice == "")
+                else if (userChoice == "n")
                 {
                     Console.WriteLine("Fine.");
-                    looping = false;
                 }
                 else
                     Console.WriteLine("Invalid key.");

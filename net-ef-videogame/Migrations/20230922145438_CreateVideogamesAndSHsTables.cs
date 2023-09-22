@@ -12,7 +12,7 @@ namespace net_ef_videogame.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "SoftwareHouse",
+                name: "SoftwareHouses",
                 columns: table => new
                 {
                     SoftwareHouseId = table.Column<long>(type: "bigint", nullable: false)
@@ -24,7 +24,7 @@ namespace net_ef_videogame.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SoftwareHouse", x => x.SoftwareHouseId);
+                    table.PrimaryKey("PK_SoftwareHouses", x => x.SoftwareHouseId);
                 });
 
             migrationBuilder.CreateTable(
@@ -42,16 +42,16 @@ namespace net_ef_videogame.Migrations
                 {
                     table.PrimaryKey("PK_Videogames", x => x.VideogameId);
                     table.ForeignKey(
-                        name: "FK_Videogames_SoftwareHouse_SoftwareHouseId",
+                        name: "FK_Videogames_SoftwareHouses_SoftwareHouseId",
                         column: x => x.SoftwareHouseId,
-                        principalTable: "SoftwareHouse",
+                        principalTable: "SoftwareHouses",
                         principalColumn: "SoftwareHouseId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_SoftwareHouse_TaxId",
-                table: "SoftwareHouse",
+                name: "IX_SoftwareHouses_TaxId",
+                table: "SoftwareHouses",
                 column: "TaxId",
                 unique: true);
 
@@ -68,7 +68,7 @@ namespace net_ef_videogame.Migrations
                 name: "Videogames");
 
             migrationBuilder.DropTable(
-                name: "SoftwareHouse");
+                name: "SoftwareHouses");
         }
     }
 }

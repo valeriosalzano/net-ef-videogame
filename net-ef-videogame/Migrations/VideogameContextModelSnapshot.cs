@@ -51,7 +51,7 @@ namespace net_ef_videogame.Migrations
                     b.HasIndex("TaxId")
                         .IsUnique();
 
-                    b.ToTable("SoftwareHouse");
+                    b.ToTable("SoftwareHouses");
                 });
 
             modelBuilder.Entity("net_ef_videogame.Models.Videogame", b =>

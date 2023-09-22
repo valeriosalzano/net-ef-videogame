@@ -12,7 +12,7 @@ using net_ef_videogame.Database;
 namespace net_ef_videogame.Migrations
 {
     [DbContext(typeof(VideogameContext))]
-    [Migration("20230922132223_CreateVideogamesAndSHsTables")]
+    [Migration("20230922145438_CreateVideogamesAndSHsTables")]
     partial class CreateVideogamesAndSHsTables
     {
         /// <inheritdoc />
@@ -54,7 +54,7 @@ namespace net_ef_videogame.Migrations
                     b.HasIndex("TaxId")
                         .IsUnique();
 
-                    b.ToTable("SoftwareHouse");
+                    b.ToTable("SoftwareHouses");
                 });
 
             modelBuilder.Entity("net_ef_videogame.Models.Videogame", b =>

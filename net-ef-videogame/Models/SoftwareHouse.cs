@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using net_ef_videogame.Database;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -29,5 +30,7 @@ namespace net_ef_videogame.Models
         {
             return $"ID {SoftwareHouseId} - {Name} - VAT {TaxId} - registered address {City}, {Country}.";
         }
+
+        
     }
 }
