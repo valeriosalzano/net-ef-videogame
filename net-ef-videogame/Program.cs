@@ -60,7 +60,6 @@ namespace net_ef_videogame
                     default:
                         Console.WriteLine("Invalid key.");
                         break;
-
                 }
             } while (userChoice != "0");
 
@@ -81,10 +80,10 @@ namespace net_ef_videogame
             DateTime videogameReleaseDate = GetValidDateFromUser();
 
             List<SoftwareHouse> shList = GetSoftwareHousesList();
+
             var shMenu = new ConsoleTable("Software Houses List");
             foreach (SoftwareHouse house in shList)
                 shMenu.AddRow($"{house.SoftwareHouseId} - {house.Name}");
-
             Console.WriteLine();
             shMenu.Write(Format.Minimal);
 
@@ -124,7 +123,6 @@ namespace net_ef_videogame
                 }
             }
         }
-
         public static void FindVideogameById()
         {
             DisplayConsoleOutput("Finding a videogame by ID");
@@ -136,7 +134,7 @@ namespace net_ef_videogame
             {
                 try
                 {
-                    Videogame? foundVideogame = db.Videogames.Where(v => v.VideogameId == videogameId).First();
+                    Videogame foundVideogame = db.Videogames.Where(v => v.VideogameId == videogameId).First();
                     DisplayConsoleOutput("Success! Videogame found.");
                     Console.WriteLine("\t" + foundVideogame);
                 }
@@ -188,7 +186,7 @@ namespace net_ef_videogame
             {
                 try
                 {
-                    Videogame? foundVideogame = db.Videogames.Where(v => v.VideogameId == videogameId).First();
+                    Videogame foundVideogame = db.Videogames.Where(v => v.VideogameId == videogameId).First();
                     try
                     {
                         db.Videogames.Remove(foundVideogame);
@@ -252,7 +250,6 @@ namespace net_ef_videogame
                 }
             }
         }
-
         public static void FindVideogamesBySoftwareHouseId()
         {
             DisplayConsoleOutput("Finding videogames by Software House ID");
@@ -262,32 +259,27 @@ namespace net_ef_videogame
 
             using (VideogameContext db = new VideogameContext())
             {
-                
                 try
                 {
                     SoftwareHouse foundSoftwareHouse = db.SoftwareHouses.Where(sh => sh.SoftwareHouseId == softwareHouseId).Include(sh => sh.Videogames).First();
-                    if (foundSoftwareHouse is null)
-                        DisplayConsoleOutput($"Can't find a Software House with id {softwareHouseId}.");
-                    else if (foundSoftwareHouse.Videogames.Count > 0)
+                    if (foundSoftwareHouse.Videogames.Count > 0)
                     {
                         Console.WriteLine($"Here is the list of videogames published by {foundSoftwareHouse.Name}:");
                         foreach (Videogame videogame in foundSoftwareHouse.Videogames)
                                 Console.WriteLine($"\t- {videogame}");
-
                     }
                     else
                         DisplayConsoleOutput("This software house hasn't released a videogame yet.");
                 }
                 catch (Exception ex)
                 {
-                    DisplayConsoleOutput("Error! Something went wrong.");
+                    DisplayConsoleOutput("Error! Software house not found.");
                     //Console.WriteLine(ex.Message);
                 }
             }
         }
 
         // UTILITIES
-
         public static List<SoftwareHouse> GetSoftwareHousesList()
         {
             List<SoftwareHouse> softwareHousesList = new List<SoftwareHouse>();
@@ -301,6 +293,7 @@ namespace net_ef_videogame
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine("Error! Can't get the software houses list.");
                     //Console.WriteLine(ex.Message);
                 }
             }
@@ -319,7 +312,6 @@ namespace net_ef_videogame
             }
             return userInput;
         }
-
         public static DateTime GetValidDateFromUser()
         {
             DateTime userInput;
