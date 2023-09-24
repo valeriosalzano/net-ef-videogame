@@ -12,7 +12,6 @@ namespace net_ef_videogame.Database
     {
         public DbSet<Videogame> Videogames { get; set; }
         public DbSet<SoftwareHouse> SoftwareHouses { get; set; }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer("Data Source=localhost;Initial Catalog=EFVideogameContext;Integrated Security=True;TrustServerCertificate=True");

@@ -2,6 +2,7 @@
 using System.Globalization;
 using ConsoleTables;
 using net_ef_videogame.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace net_ef_videogame
 {
@@ -9,16 +10,19 @@ namespace net_ef_videogame
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("\n --- Program START --- \n");
+
             string userChoice;
             do
             {
-                var menu = new ConsoleTable("                   MENU");
+                var menu = new ConsoleTable(" --- MENU --- ");
 
                 menu.AddRow("1 - Insert a new video game.");
                 menu.AddRow("2 - Search for a video game by ID.");
                 menu.AddRow("3 - Search for all games with the name containing a certain string.");
                 menu.AddRow("4 - Delete a video game.");
                 menu.AddRow("5 - Insert a new software house.");
+                menu.AddRow("6 - Search videogames by Software House ID.");
                 menu.AddRow("0 - Close the program");
 
                 Console.WriteLine("\n");
@@ -44,6 +48,9 @@ namespace net_ef_videogame
                         break;
                     case "5":
                         InsertSoftwareHouse();
+                        break;
+                    case "6":
+                        FindVideogamesBySoftwareHouseId();
                         break;
                     case "0":
                         Console.WriteLine("Goodbye!");
@@ -164,8 +171,6 @@ namespace net_ef_videogame
                     //Console.WriteLine(ex.Message);
                 }
             }
-
-
         }
         public static void DeleteVideogame()
         {
@@ -240,6 +245,38 @@ namespace net_ef_videogame
                 finally
                 {
                     Console.WriteLine(inserted ? "Success! Software house added." : "Error! Something went wrong.");
+                }
+            }
+        }
+
+        public static void FindVideogamesBySoftwareHouseId()
+        {
+            Console.WriteLine("\n--- Finding videogames by Software House ID ---\n");
+
+            Console.Write("Enter the software house id: ");
+            int softwareHouseId = GetValidPositiveIntegerFromUser();
+
+            using (VideogameContext db = new VideogameContext())
+            {
+                
+                try
+                {
+                    SoftwareHouse foundSoftwareHouse = db.SoftwareHouses.Where(sh => sh.SoftwareHouseId == softwareHouseId).Include(sh => sh.Videogames).First();
+
+                    if (foundSoftwareHouse.Videogames.Count() > 0)
+                    {
+                        Console.WriteLine($"Here is the list of videogames published by {foundSoftwareHouse.Name}:");
+                        foreach (Videogame videogame in foundSoftwareHouse.Videogames)
+                                Console.WriteLine($"\t- {videogame}");
+
+                    }
+                    else
+                        Console.WriteLine("This software house hasn't released a videogame yet.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error! Something went wrong.");
+                    //Console.WriteLine(ex.Message);
                 }
             }
         }
