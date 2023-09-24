@@ -12,7 +12,7 @@ using net_ef_videogame.Database;
 namespace net_ef_videogame.Migrations
 {
     [DbContext(typeof(VideogameContext))]
-    [Migration("20230922145438_CreateVideogamesAndSHsTables")]
+    [Migration("20230924195447_CreateVideogamesAndSHsTables")]
     partial class CreateVideogamesAndSHsTables
     {
         /// <inheritdoc />

@@ -24,7 +24,7 @@ namespace net_ef_videogame.Models
 
         public override string ToString()
         {
-            return $"ID: {VideogameId}, {Name} - released on {ReleaseDate.ToString("dd/MM/yyyy")} by SoftwareHouse with ID: {SoftwareHouseId}.";
+            return $"ID: {VideogameId} - {Name} - Release date: {ReleaseDate.ToString("dd/MM/yyyy")} - Software house id: {SoftwareHouseId}.";
         }
     }
 }

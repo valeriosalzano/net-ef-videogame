@@ -3,6 +3,7 @@ using System.Globalization;
 using ConsoleTables;
 using net_ef_videogame.Database;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.Intrinsics.Arm;
 
 namespace net_ef_videogame
 {
@@ -10,12 +11,13 @@ namespace net_ef_videogame
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("\n --- Program START --- \n");
+
+            DisplayConsoleOutput("PROGRAM START");
 
             string userChoice;
             do
             {
-                var menu = new ConsoleTable(" --- MENU --- ");
+                var menu = new ConsoleTable(" MENU ");
 
                 menu.AddRow("1 - Insert a new video game.");
                 menu.AddRow("2 - Search for a video game by ID.");
@@ -25,9 +27,9 @@ namespace net_ef_videogame
                 menu.AddRow("6 - Search videogames by Software House ID.");
                 menu.AddRow("0 - Close the program");
 
-                Console.WriteLine("\n");
+                Console.WriteLine("");
                 menu.Write();
-                Console.WriteLine("\n");
+                Console.WriteLine("");
 
                 Console.Write("Press the desidered command key: ");
                 userChoice = Console.ReadLine() ?? "";
@@ -62,12 +64,13 @@ namespace net_ef_videogame
                 }
             } while (userChoice != "0");
 
-            Console.WriteLine("\n --- Program END --- \n");
+            DisplayConsoleOutput("PROGRAM END");
         }
 
+        // MENU OPTIONS
         public static void InsertVideogame()
         {
-            Console.WriteLine("\n--- Inserting a new videogame ---\n");
+            DisplayConsoleOutput("Inserting a new videogame");
 
             Console.Write("Enter the videogame name: ");
             string videogameName = GetValidStringFromUser();
@@ -78,23 +81,20 @@ namespace net_ef_videogame
             DateTime videogameReleaseDate = GetValidDateFromUser();
 
             List<SoftwareHouse> shList = GetSoftwareHousesList();
-            var shMenu = new ConsoleTable(" --- Choose Software House --- ");
+            var shMenu = new ConsoleTable("Software Houses List");
             foreach (SoftwareHouse house in shList)
-            {
                 shMenu.AddRow($"{house.SoftwareHouseId} - {house.Name}");
-            }
 
-            Console.WriteLine("\n");
-            shMenu.Write();
-            Console.WriteLine("\n");
+            Console.WriteLine();
+            shMenu.Write(Format.Minimal);
 
             Console.Write("Enter the software house id: ");
-            int videogameSHId = GetValidPositiveIntegerFromUser(); ;
-            while (videogameSHId > shList.Count())
+            int videogameSHId = GetValidPositiveIntegerFromUser();
+            while (videogameSHId > shList.Count)
             {
-                Console.Write("Id out of range. Insert a valid value: ");
+                Console.Write("Insert a valid software house id: ");
                 videogameSHId = GetValidPositiveIntegerFromUser();
-            } 
+            }
             
             Videogame newVideogame = new Videogame()
             {
@@ -106,28 +106,28 @@ namespace net_ef_videogame
 
             using (VideogameContext db = new VideogameContext())
             {
-                bool inserted = false;
+                bool videogameInserted = false;
                 try
                 {
                     db.Add(newVideogame);
                     db.SaveChanges();
-                    inserted = true;
+                    videogameInserted = true;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
-                    inserted = false;
+                    //Console.WriteLine(ex.Message);
+                    videogameInserted = false;
                 }
                 finally
                 {
-                    Console.WriteLine(inserted ? "Success! Videogame added." : "Error! Something went wrong.");
+                    DisplayConsoleOutput(videogameInserted ? "Success! Videogame added." : "Error! Something went wrong.");
                 }
             }
         }
 
         public static void FindVideogameById()
         {
-            Console.WriteLine("\n--- Finding a videogame by ID ---\n");
+            DisplayConsoleOutput("Finding a videogame by ID");
 
             Console.Write("Enter the videogame ID: ");
             int videogameId = GetValidPositiveIntegerFromUser();
@@ -137,18 +137,19 @@ namespace net_ef_videogame
                 try
                 {
                     Videogame? foundVideogame = db.Videogames.Where(v => v.VideogameId == videogameId).First();
-                    Console.WriteLine("Success! Videogame found. " + foundVideogame);
+                    DisplayConsoleOutput("Success! Videogame found.");
+                    Console.WriteLine("\t" + foundVideogame);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Videogame not found.");
+                    DisplayConsoleOutput("Videogame not found");
                 }
             }
 
         }
         public static void FindVideogameByName()
         {
-            Console.WriteLine("\n--- Finding a videogame by Name ---\n");
+            DisplayConsoleOutput("Finding a videogame by Name");
 
             Console.Write("Enter the videogame name: ");
             string videogameName = GetValidStringFromUser();
@@ -159,22 +160,26 @@ namespace net_ef_videogame
                 {
                     List<Videogame> foundVideogames = db.Videogames.Where(videogame => videogame.Name.Contains(videogameName)).ToList<Videogame>();
 
-                    if (foundVideogames.Count() > 0)
+                    if (foundVideogames.Count > 0)
+                    {
+                        DisplayConsoleOutput($"Success! Videogame{(foundVideogames.Count > 1 ? "s":"")} found");
+
                         foreach (Videogame videogame in foundVideogames)
-                            Console.WriteLine($"- {videogame}");
+                            Console.WriteLine($"\t- {videogame}");
+                    }
                     else
-                        Console.WriteLine("Videogame not found.");
+                        DisplayConsoleOutput("Videogame not found");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Error! Something went wrong.");
+                    DisplayConsoleOutput("Error! Something went wrong");
                     //Console.WriteLine(ex.Message);
                 }
             }
         }
         public static void DeleteVideogame()
         {
-            Console.WriteLine("\n--- Deleting a videogame by ID ---\n");
+            DisplayConsoleOutput("Deleting a videogame by ID");
 
             Console.Write("Enter the videogame ID: ");
             int videogameId = GetValidPositiveIntegerFromUser();
@@ -184,29 +189,28 @@ namespace net_ef_videogame
                 try
                 {
                     Videogame? foundVideogame = db.Videogames.Where(v => v.VideogameId == videogameId).First();
-
                     try
                     {
                         db.Videogames.Remove(foundVideogame);
                         db.SaveChanges();
-                        Console.WriteLine("Success! Videogame deleted.");
+                        DisplayConsoleOutput("Success! Videogame deleted");
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine("Cannot delete the videogame.");
+                        DisplayConsoleOutput("Cannot delete the videogame");
                         //Console.WriteLine(ex.Message);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Cannot find the videogame.");
+                    DisplayConsoleOutput("Videogame not found");
                     //Console.WriteLine(ex.Message);
                 }
             }
         }
         public static void InsertSoftwareHouse()
         {
-            Console.WriteLine("\n--- Inserting a new software house ---\n");
+            DisplayConsoleOutput("Inserting a new software house");
 
             Console.Write("Enter the software house name: ");
             string softwareHouseName = GetValidStringFromUser();
@@ -239,19 +243,19 @@ namespace net_ef_videogame
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    //Console.WriteLine(ex.Message);
                     inserted = false;
                 }
                 finally
                 {
-                    Console.WriteLine(inserted ? "Success! Software house added." : "Error! Something went wrong.");
+                    DisplayConsoleOutput(inserted ? "Success! Software house added" : "Error! Something went wrong");
                 }
             }
         }
 
         public static void FindVideogamesBySoftwareHouseId()
         {
-            Console.WriteLine("\n--- Finding videogames by Software House ID ---\n");
+            DisplayConsoleOutput("Finding videogames by Software House ID");
 
             Console.Write("Enter the software house id: ");
             int softwareHouseId = GetValidPositiveIntegerFromUser();
@@ -262,8 +266,9 @@ namespace net_ef_videogame
                 try
                 {
                     SoftwareHouse foundSoftwareHouse = db.SoftwareHouses.Where(sh => sh.SoftwareHouseId == softwareHouseId).Include(sh => sh.Videogames).First();
-
-                    if (foundSoftwareHouse.Videogames.Count() > 0)
+                    if (foundSoftwareHouse is null)
+                        DisplayConsoleOutput($"Can't find a Software House with id {softwareHouseId}.");
+                    else if (foundSoftwareHouse.Videogames.Count > 0)
                     {
                         Console.WriteLine($"Here is the list of videogames published by {foundSoftwareHouse.Name}:");
                         foreach (Videogame videogame in foundSoftwareHouse.Videogames)
@@ -271,11 +276,11 @@ namespace net_ef_videogame
 
                     }
                     else
-                        Console.WriteLine("This software house hasn't released a videogame yet.");
+                        DisplayConsoleOutput("This software house hasn't released a videogame yet.");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Error! Something went wrong.");
+                    DisplayConsoleOutput("Error! Something went wrong.");
                     //Console.WriteLine(ex.Message);
                 }
             }
@@ -314,12 +319,13 @@ namespace net_ef_videogame
             }
             return userInput;
         }
+
         public static DateTime GetValidDateFromUser()
         {
             DateTime userInput;
             while (!DateTime.TryParseExact(Console.ReadLine(), "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out userInput))
             {
-                Console.Write("Insert a valid date format: ");
+                Console.Write("Insert a valid date format (dd/mm/yyyy): ");
             }
             return userInput;
         }
@@ -327,33 +333,134 @@ namespace net_ef_videogame
         {
             int userInput;
             while (!int.TryParse(Console.ReadLine(), out userInput) || userInput <= 0)
-            {
                 Console.Write("Insert a positive number: ");
-            }
             return userInput;
         }
         public static string GetOptionalParameterFromUser(string parameterName)
         {
             string outputString = "";
-            string userChoice = "";
-            while (userChoice != "n")
+            bool isInputValid = false;
+            while(!isInputValid)
             {
                 Console.Write($"Do you want to set the {parameterName}? (y/n) ");
-                userChoice = GetValidStringFromUser().ToLower();
+                string userChoice = Console.ReadLine() ?? "" ;
 
-                if (userChoice == "y")
+                switch (userChoice.ToLower().Trim())
                 {
-                    Console.Write($"Enter the {parameterName}: ");
-                    outputString = GetValidStringFromUser();
+                    case "yes":
+                    case "y":
+                        Console.Write($"Enter the {parameterName}: ");
+                        outputString = GetValidStringFromUser();
+                        isInputValid = true; 
+                        break;
+                    case "":
+                    case "n":
+                    case "no":
+                        isInputValid = true;
+                        break;
+                    default:
+                        Console.WriteLine("Invalid key.");
+                        isInputValid = false;
+                        break;
                 }
-                else if (userChoice == "n")
-                {
-                    Console.WriteLine("Fine.");
-                }
-                else
-                    Console.WriteLine("Invalid key.");
+
             }
             return outputString;
+        }
+
+        // CONSOLE OUTPUT FUNCTIONS
+        public static void DisplayConsoleOutput(string message)
+        {
+            Console.WriteLine($"\n --- {message} --- \n");
+        }
+
+        // SEEDER
+        public static void Seeder()
+        {
+            List<SoftwareHouse> shList = new List<SoftwareHouse>();
+            shList.Add( new SoftwareHouse()
+            {
+                Name = "Nintendo",
+                TaxId = "ME-697-14-7528-0",
+                City = "Kyoto",
+                Country = "Japan"
+            });
+            shList.Add(new SoftwareHouse()
+            {
+                Name = "Valve Corporation",
+                TaxId = "UT-277-92-7542-2",
+                City = "Bellevue",
+                Country = "United States"
+            });
+            shList.Add(new SoftwareHouse()
+            {
+                Name = "Rockstar Games",
+                TaxId = "GA-160-16-9503-1",
+                City = "New York City",
+                Country = "United States"
+            });
+            shList.Add(new SoftwareHouse()
+            {
+                Name = "Electronic Arts",
+                TaxId = "SD-032-99-9226-3",
+                City = "Redwood City",
+                Country = "United States"
+            });
+            shList.Add(new SoftwareHouse()
+            {
+                Name = "Ubisoft",
+                TaxId = "NC-134-01-6528-4",
+                City = "Montreuil",
+                Country = "France"
+            });
+            shList.Add(new SoftwareHouse()
+            {
+                Name = "Konami",
+                TaxId = "ID-418-30-7570-5",
+                City = "Kyoto",
+                Country = "Japan"
+            });
+
+
+
+            List<Videogame> vgList = new List<Videogame>();
+
+            DateTime start = new DateTime(1995, 1, 1);
+            int range = (DateTime.Today - start).Days;
+
+            for(int i = 0; i < 30; i++)
+            {
+                vgList.Add(new Videogame()
+                {
+                    Name = "videogame" + (i + 1),
+                    Overview = "Lorem ipsum",
+                    ReleaseDate = start.AddDays(Random.Shared.Next(range)),
+                    SoftwareHouseId = Random.Shared.Next(1, shList.Count + 1)
+                });
+            }
+
+            using (VideogameContext db = new VideogameContext())
+            {
+                try
+                {
+                    foreach (SoftwareHouse sh in shList)
+                    {
+                        db.Add(sh);
+                        db.SaveChanges();
+                    }
+                    foreach (Videogame vg in vgList)
+                    {
+                        db.Add(vg);
+                        db.SaveChanges();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.InnerException);
+                }
+            }
+
+
         }
     }
 }
